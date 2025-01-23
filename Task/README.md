@@ -6,7 +6,7 @@ Este projeto contém um assistente de IA que recebe uma mensagem do usuário, de
 
 1. [Arquivos Principais](#arquivos-principais)  
 2. [Fluxo de Funcionamento](#fluxo-de-funcionamento)  
-3. [Instalação e Configuração](#[instalação-e-configuração])(https://github.com/Ambrosio1994/Agents/blob/main/Task/config.py)
+3. [Instalação e Configuração](https://github.com/Ambrosio1994/Agents/blob/main/Task/config.py)
 4. [Agendamento de Tarefas](#agendamento-de-tarefas)  
 5. [Estrutura de Diretórios](#estrutura-de-diretórios)  
 
