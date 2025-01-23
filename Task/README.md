@@ -89,7 +89,3 @@ Este projeto contém um assistente de IA que recebe uma mensagem do usuário, de
 - O loop de eventos é criado e mantido em execução, aguardando a chegada do horário definido.
 
 ---
-
-## Estrutura de Diretórios
-
-Uma visão simplificada: 
