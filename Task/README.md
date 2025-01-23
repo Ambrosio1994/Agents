@@ -14,7 +14,7 @@ Este projeto contém um assistente de IA que recebe uma mensagem do usuário, de
 
 ## Componentes
 
-1. [Config]([URL](https://github.com/Ambrosio1994/Agents/blob/main/Task/config.py)
+1. [Config](https://github.com/Ambrosio1994/Agents/blob/main/Task/config.py)
 2. [Graph](https://github.com/Ambrosio1994/Agents/blob/main/Task/graph.py)
 3. [Main](https://github.com/Ambrosio1994/Agents/blob/main/Task/main.py)
 4. [Model](https://github.com/Ambrosio1994/Agents/blob/main/Task/model.py)
