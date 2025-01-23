@@ -8,13 +8,24 @@ Este projeto contém um assistente de IA que recebe uma mensagem do usuário, de
 2. [Fluxo de Funcionamento](#fluxo-de-funcionamento)  
 3. [Instalação e Configuração](#instalação-e-configuração)  
 4. [Agendamento de Tarefas](#agendamento-de-tarefas)  
-5. [Estrutura de Diretórios](#estrutura-de-diretórios)  
+5. [Estrutura de Diretórios](#estrutura-de-diretórios)
+
+---
+
+## Estrutura de Diretórios
+
+1. [Config](https://github.com/Ambrosio1994/Agents/blob/main/Task/config.py)
+2. [Graph](https://github.com/Ambrosio1994/Agents/blob/main/Task/graph.py)
+3. [Main](https://github.com/Ambrosio1994/Agents/blob/main/Task/main.py)
+4. [Model](https://github.com/Ambrosio1994/Agents/blob/main/Task/model.py)
+5. [Prompt](https://github.com/Ambrosio1994/Agents/blob/main/Task/prompts.py)
+6. [State](https://github.com/Ambrosio1994/Agents/blob/main/Task/state.py)
 
 ---
 
 ## Arquivos Principais
 
-- <b>brew/model.py</b>  
+- <b>Task/model.py</b>  
   Contém funções responsáveis por criar modelos de linguagem (ChatOpenAI) e instanciar agentes (AgentExecutor) para processamento de linguagem natural e buscas na web.
 
   - <b>make_model(model: str)</b>  
@@ -28,29 +39,29 @@ Este projeto contém um assistente de IA que recebe uma mensagem do usuário, de
 - <b>brew/main.py</b>  
   Gera e executa a tarefa principal de forma assíncrona. Valida se a data e hora fornecidas são adequadas para o agendamento. Caso sejam válidas, cria um novo loop de eventos e agenda a execução do fluxo principal por meio de cron.
 
-- <b>brew/config.py</b>  
+- <b>Task/config.py</b>  
   Define a classe <b>CFG</b>, responsável por unificar as variáveis de ambiente e configurações importantes, como modelos de IA, URLs de API, chaves de acesso, e o prompt utilizado pelo LangChain.
 
-- <b>brew/graph.py</b>  
+- <b>Task/graph.py</b>  
   Monta o grafo de estados e define as funções que serão executadas:
   - <b>make_decision(state: State)</b>: Decide se uma busca na web é necessária.  
   - <b>get_response(state: State)</b>: Obtém a resposta final, usando ou não a busca/web.  
   - <b>compile_graph()</b>: Compila o grafo definindo o fluxo de execução.
 
-- <b>brew/prompts.py</b>  
+- <b>Task/prompts.py</b>  
   Define os prompts utilizados para gerar as mensagens de instrução e decisão.  
   - <b>PROMPT_TEMPLATE_INSTRUCTIONS</b>: Fornece um contexto para tarefas simples, como lembretes.  
   - <b>PROMPT_TEMPLATE_DECISION</b>: Orienta o modelo a decidir entre "sim" e "nao" para a busca na web.
 
-- <b>brew/state.py</b>  
+- <b>Task/state.py</b>  
   Define a estrutura do estado (<b>State</b>) usando <i>TypedDict</i> e a classe <b>Decision</b> (modelo Pydantic) para determinar a decisão de busca.
 
 ---
 
 ## Fluxo de Funcionamento
 
-1. O ponto de entrada é o arquivo <b>brew/main.py</b>, que agenda a execução assíncrona.  
-2. Quando a tarefa é disparada, a função <b>main_async()</b> invoca o fluxo compilado em <b>brew/graph.py</b>.  
+1. O ponto de entrada é o arquivo <b>Task/main.py</b>, que agenda a execução assíncrona.  
+2. Quando a tarefa é disparada, a função <b>main_async()</b> invoca o fluxo compilado em <b>Task/graph.py</b>.  
 3. Esse fluxo ([StateGraph](https://github.com/hwchase17/langchain), adaptado neste projeto) chama <b>make_decision()</b> para decidir se a tarefa requer busca na web.  
    - Se <b>decision</b> == "nao", uma resposta simples é retornada ao usuário, sem processo adicional.  
    - Se <b>decision</b> == "sim", o projeto executa o agente retornado por <b>make_agent()</b>, que faz uso de ferramentas internas (TavilySearchResults) para coletar informações e gerar a resposta.  
@@ -73,12 +84,8 @@ Este projeto contém um assistente de IA que recebe uma mensagem do usuário, de
 
 ## Agendamento de Tarefas
 
-- O arquivo <b>brew/main.py</b> usa <i>apscheduler</i> para agendar a execução da função <b>main_async()</b>.  
+- O arquivo <b>Task/main.py</b> usa <i>apscheduler</i> para agendar a execução da função <b>main_async()</b>.  
 - É possível definir a data (<b>date</b>) e hora (<b>time</b>) para a execução de cada tarefa. Caso sejam anteriores ao horário atual, as tarefas não são agendadas.  
 - O loop de eventos é criado e mantido em execução, aguardando a chegada do horário definido.
 
 ---
-
-## Estrutura de Diretórios
-
-Uma visão simplificada: 
