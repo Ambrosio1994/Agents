@@ -1,75 +1,64 @@
-from typing import Dict
-
 from langgraph.graph import START, END, StateGraph
 
-from state import State, Decision
-from model import make_agent, make_model
-from prompts import PROMPT_TEMPLATE_INSTRUCTIONS, PROMPT_TEMPLATE_DECISION
+from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_openai import ChatOpenAI
+from langchain.agents import AgentExecutor, Tool, create_react_agent
 
-def make_decision(state: State) -> Dict:
-    """
-    Avalia a mensagem do usuário para decidir se é necessário
-    realizar buscas na web.
+import os
 
-    Parâmetros:
-        state (State): Estado com a mensagem recebida.
+from prompts import PROMPT_TEMPLATE
+from state import State
+from config import CFG
 
-    Retorna:
-        dict: Dicionário contendo a decisão ("sim" ou "nao") em "decision".
-    """
-    input = state['message']
-    llm = make_model(model="chat")
-    llm_with_structured = llm.with_structured_output(Decision)
-    avaliador = PROMPT_TEMPLATE_DECISION | llm_with_structured
-    dec = avaliador.invoke({"input": input}).decisao
+search_fn = TavilySearchResults(max_results=5, 
+                             api_key=os.getenv("TAVILY_API_KEY"))
 
-    return {"decision": dec}
+search_tool = Tool(
+    name="search_tool",
+    func=search_fn.run,
+    description="Use for web searches"
+)
 
-def get_response(state: State) -> Dict:
-    """
-    Com base na decisão, retorna a resposta final ao usuário:
-    - Se 'decision' for "nao", apenas formata a resposta sem busca adicional.
-    - Se 'decision' for "sim", utiliza o agente para buscar mais informações.
+tools = [search_tool]
+tool_names = ", ".join([tool.name for tool in tools])
 
-    Parâmetros:
-        state (State): Estado com a mensagem do usuário e a decisão tomada.
+def make_agent():
+     
+     llm = ChatOpenAI( 
+            model=CFG.model, 
+            base_url=CFG.base_url,
+            api_key=CFG.API_KEY,
+            temperature=0
+        )
+     
+     agent = create_react_agent(llm, tools, PROMPT_TEMPLATE)
+     agent_executor = AgentExecutor(agent=agent, 
+                                    tools=tools, 
+                                    handle_parsing_errors=True,
+                                    verbose=True)
 
-    Retorna:
-        dict: Dicionário contendo a mensagem de resposta em "message".
-    """
-    if state['decision'] == "nao":
-        llm = make_model(model="chat")
-        chain = PROMPT_TEMPLATE_INSTRUCTIONS| llm
-        response = chain.invoke({"input": state['message']})
+     return agent_executor
 
-        return {"message": response.content}
+def model_response(state:State):
+    agent_executor = make_agent()
+    resp = agent_executor.invoke(
+        {
+            "input": state["message"],
+            "tools": tools,
+            "tool_names": tool_names,
+            "agent_scratchpad": ""
+        }
+    )
     
-    else:   
-        agent_executor = make_agent()
+    return {"message": resp["output"]}
 
-        resp = agent_executor.invoke({
-            "input": state['message'],
-        })
-        
-        return {"message": resp["output"]}
-       
 def compile_graph():
-    """
-    Compila e retorna o grafo de estados configurado, definindo
-    o fluxo de execução entre a decisão e o agente de busca.
-
-    Retorna:
-        Callable: Grafo compilado para manipular o estado e as transições.
-    """
-    # Configuração do grafo
     workflow = StateGraph(State)
     
     # Adiciona os nós
-    workflow.add_node("make_decision_node", make_decision)
-    workflow.add_node("agent", get_response)
+    workflow.add_node("agent", model_response)
 
     # Define o fluxo
-    workflow.add_edge(START, "make_decision_node")
-    workflow.add_edge("make_decision_node", "agent")
+    workflow.add_edge(START, "agent")
     workflow.add_edge("agent", END)
-    return workflow.compile()   
+    return workflow.compile() 

@@ -1,7 +1,6 @@
 from langchain.prompts import ChatPromptTemplate
 
-PROMPT_INSTRUCTIONS = """
-Você é um assistente de IA responsável por ajudar os
+SYSTEM = """Você é um assistente de IA responsável por ajudar os
 usuários em suas tarefas.
 
 As tarefas podem ser apenas um lembrete, como:
@@ -14,42 +13,30 @@ Para essas tarefas apenas informe o usuario, por exemplo:
 "Lembrar de tomar água"
 "Lembrar de fazer exercícios"
 
-4. Mantenha um tom educado e útil em suas respostas.
+Ou podem ser tarefas mais complexas, como:
+- Pesquisa de notícias
+- Pesquisa de informações sobre um determinado assunto
 
-Você tem acesso às seguintes ferramentas:
-"""
+Para essas tarefas você deve usar a ferramenta de pesquisa web.
 
-PROMPT_TEMPLATE_INSTRUCTIONS = ChatPromptTemplate.from_messages(
-    [
-        ("system", PROMPT_INSTRUCTIONS),
-        ("human", "{input}"),
-    ]
-)
-"""
-Este template define uma sequência de mensagens para contextualizar
-o modelo, com instruções do sistema e a entrada do usuário.
-"""
+Você tem acesso às seguintes ferramentas: {tool_names}
 
-PROMPT_DECISION = """
-Você é um assistente de IA responsável por decidir se 
-a tarefa precisa de busca na web.
+{tools}
 
-Sua tarefa é decidir se a tarefa precisa de busca na web.
+Use o formato EXATO abaixo:
 
-Você receberá uma mensagem do usuário e você deve decidir 
-se a tarefa precisa de busca na web.
+Question: a pergunta do usuário
+Thought: você deve pensar sobre o que precisa fazer
+Action: o nome da ferramenta a ser usada
+Action Input: a entrada para a ferramenta
+Observation: o resultado da ferramenta
+... (este ciclo Thought/Action/Action Input/Observation pode se repetir)
+Thought: agora sei a resposta final
+Final Answer: a resposta final para o usuário
 
-Se a tarefa precisa de busca na web, informe apenas "sim", 
-caso contrário informe apenas "nao".
-"""
+Lembre-se: Sempre use o formato EXATO acima, com as palavras-chave em inglês.
 
-PROMPT_TEMPLATE_DECISION = ChatPromptTemplate.from_messages(
-    [
-        ("system", PROMPT_DECISION),
-        ("human", "{input}"),
-    ]
-)
-"""
-Este template instrui o modelo a decidir se a requisição
-do usuário demanda busca na web, retornando apenas "sim" ou "nao".
-"""
+Question: {input}
+{agent_scratchpad}"""
+
+PROMPT_TEMPLATE = ChatPromptTemplate.from_template(SYSTEM)

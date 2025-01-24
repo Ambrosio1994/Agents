@@ -4,9 +4,9 @@ import pytz
 from datetime import datetime
 import asyncio
 
-date = "DATA PARA EXECUÇÃO, FORMATO: YYYY-MM-DD"
-time = "HORA PARA EXECUÇÃO, FORMATO: HH:MM"
-task = "EXEMPLO DE TAREFA"
+date = "2025-01-24"
+time = "18:08"
+task = "tirar o lixo"
 
 # Função criada para tratar o fluxo de forma assíncrona
 async def main_async():
@@ -17,14 +17,17 @@ async def main_async():
     Retorna:
         Nenhum valor de retorno. As saídas são exibidas no console.
     """
-    # Validação de data
     app = compile_graph()
     print(f"Executando tarefa às {datetime.now(pytz.timezone('America/Sao_Paulo')).strftime('%H:%M:%S')}")
+    
+    # Enviando a mensagem no formato correto
     result = await asyncio.to_thread(
         app.invoke,
-        {"message": task},
+        {"message": task}
     )
-    print(result['message'])
+    
+    # Acessando a resposta corretamente
+    print(result["message"])
 
 if __name__ == "__main__":
     # VALIDAÇÃO DE DATA E HORA
