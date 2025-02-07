@@ -114,6 +114,3 @@ async def deep_search(query: str):
     search = DeepSearch()
     result = await search._arun(query)
     return result
-
-if __name__ == "__main__":
-    print(asyncio.run(deep_search("Petrobras")))

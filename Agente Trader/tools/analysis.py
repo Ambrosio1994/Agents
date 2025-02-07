@@ -1,10 +1,8 @@
 # Ferramentas para fazer análises das ações para verificar o desempenho e tomar decisões
 
-from langchain_core.tools import tool
 import yfinance as yf
 import numpy as np
 
-@tool
 def analyze_stock(symbol: str) -> str:
     """
     Realiza uma análise detalhada da ação utilizando dados históricos e métricas fundamentais.
@@ -107,7 +105,3 @@ def analyze_stock(symbol: str) -> str:
         return analysis_text
     except Exception as e:
         return f"Erro ao analisar {symbol}: {str(e)}"
-
-if __name__ == "__main__":
-    symbol = "AAPL" 
-    print(analyze_stock.invoke(symbol))
