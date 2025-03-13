@@ -1,0 +1,92 @@
+# Configurações do Sistema de Agentes
+# Author: Ambrosio1994
+# Data: Março, 2025
+
+# Configurações gerais
+general:
+  log_level: INFO  # DEBUG, INFO, WARNING, ERROR
+  enable_telemetry: false
+  theme: light  # light, dark
+
+# Configurações da API
+api:
+  host: localhost
+  port: 8000
+  debug: true
+
+# Configurações da interface
+interface:
+  host: localhost
+  port: 8501
+  title: "Sistema de Agentes Unificado"
+  icon: "🤖"
+
+# Configurações dos agentes
+agents:
+  # Agente Trader
+  trader:
+    auto_start: false
+    refresh_interval: 60  # segundos
+    risk_level: medium  # low, medium, high
+    assets:
+      - PETR4
+      - VALE3
+      - ITUB4
+      - BBDC4
+    api_keys:
+      alphavantage: ""
+      yahoo_finance: ""
+  
+  # Escritor de Artigo
+  escritor:
+    auto_start: false
+    max_tokens: 2000
+    model: gemini-pro
+    styles:
+      - formal
+      - técnico
+      - jornalístico
+      - acadêmico
+    api_keys:
+      gemini: ""
+      anthropic: ""
+  
+  # Agente SQL
+  sql:
+    auto_start: false
+    max_db_connections: 3
+    timeout: 30  # segundos
+    databases:
+      - name: "financeiro"
+        type: "sqlite"
+        path: "../agente-sql/db/financeiro.db"
+      - name: "mercado"
+        type: "sqlite"
+        path: "../agente-sql/db/mercado.db"
+  
+  # Sistema de Tarefas
+  tarefa:
+    auto_start: false
+    parallelism: 4
+    max_retries: 3
+    timeout: 3600  # segundos
+    store_results: true
+    result_dir: "../tarefa/results"
+
+# Configurações de segurança
+security:
+  enable_auth: false
+  jwt_secret: ""  # Preencher em produção
+  token_expiry: 86400  # 24 horas em segundos
+  cors_origins:
+    - http://localhost:8501
+    - http://127.0.0.1:8501
+
+# Configurações de monitoramento
+monitoring:
+  collect_metrics: true
+  metric_interval: 60  # segundos
+  alert_thresholds:
+    cpu: 80  # porcentagem
+    memory: 70  # porcentagem
+    error_rate: 5  # erros por minuto
